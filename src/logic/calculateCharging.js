@@ -43,6 +43,10 @@ export function getChargingMilliseconds(kwh, chargingRateKwh) {
   return secondsToMilliseconds(timeInSeconds)
 }
 
-export function getChargingStartTime(millisecondsToCharge, targetFinishTime) {
-  return targetFinishTime - millisecondsToCharge
-}
+
+export function getChargingStartTime(millisecondsToCharge, targetFinishDate, targetFinishTime) {
+    let finishDate = new Date(targetFinishDate);
+    const [finishHours, finishMinutes] = targetFinishTime.split(':').map(Number);
+    finishDate.setHours(finishHours, finishMinutes, 0, 0);
+    return new Date(finishDate).getTime() - millisecondsToCharge;
+  }

@@ -5,37 +5,51 @@ import {
   currentPercAsMissingKwh,
   getChargingMilliseconds,
   getChargingStartTime,
-  computeRemainingPercentage,
+  computeRemainingCarState,
   computeChargingDetails,
 } from '../calculateCharging'
 import { millisecondsToHours, secondsToMilliseconds } from 'date-fns'
 
-describe('computeRemainingPercentage', () => {
+describe('computeRemainingCarState', () => {
   it('should calculate remaing percentage with valid remaining Km input', () => {
     const remainingKm = 50
     const remainingPercentage = null
     const maxKmRange = 100
+    const expectedKm = remainingKm 
     const expectedPercentage = 50
-    expect(computeRemainingPercentage(remainingKm, remainingPercentage, maxKmRange)).toBe(
-      expectedPercentage,
+
+    const [actualKm, actualPercentage] = computeRemainingCarState(
+      remainingKm,
+      remainingPercentage,
+      maxKmRange,
     )
+
+    expect(actualKm).toBe(expectedKm)
+    expect(actualPercentage).toBe(expectedPercentage)
   })
 
   it('should return the remaining percentage, nothing to be calculated', () => {
     const remainingKm = 0
     const remainingPercentage = 50
     const maxKmRange = 100
-    const expectedPercentage = 50
-    expect(computeRemainingPercentage(remainingKm, remainingPercentage, maxKmRange)).toBe(
-      expectedPercentage,
+    const expectedKm = 50
+    const expectedPercentage = remainingPercentage
+
+    const [actualKm, actualPercentage] = computeRemainingCarState(
+      remainingKm,
+      remainingPercentage,
+      maxKmRange,
     )
+
+    expect(actualKm).toBe(expectedKm)
+    expect(actualPercentage).toBe(expectedPercentage)
   })
 
   it('should should throw an error if both remaining Km and Percentage are invalid', () => {
     const remainingKm = null
     const remainingPercentage = 0
     const maxKmRange = 100
-    expect(() => computeRemainingPercentage(remainingKm, remainingPercentage, maxKmRange)).toThrow(
+    expect(() => computeRemainingCarState(remainingKm, remainingPercentage, maxKmRange)).toThrow(
       'You have to at least provide remaining kilometers or remaining percentage',
     )
   })

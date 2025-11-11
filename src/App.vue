@@ -1,34 +1,52 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
+import IconEvStation from './components/icons/IconEvStation.vue'
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+  <div class="app-container">
+    <header>
+      <IconEvStation />
+      <div class="wrapper">
+        <HelloWorld msg="EV Charger" />
+        <nav>
+          <RouterLink to="/">Home</RouterLink>
+          <RouterLink to="/about">About</RouterLink>
+        </nav>
+      </div>
+    </header>
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
-
-  <RouterView />
+    <main class="router-content-wrapper">
+      <RouterView />
+    </main>
+  </div>
 </template>
 
 <style scoped>
+.app-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
 header {
   line-height: 1.5;
   max-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem 0;
+  width: 100%;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+header .wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 nav {
@@ -56,30 +74,60 @@ nav a:first-of-type {
   border: 0;
 }
 
+.router-content-wrapper {
+  width: 100%;
+  max-width: 600px;
+  margin-top: 2rem;
+  padding: 0 1rem;
+  text-align: left;
+}
+
 @media (min-width: 1024px) {
-  header {
+  .app-container {
     display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
   }
 
-  .logo {
-    margin: 0 2rem 0 0;
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding-right: 0;
+    width: 100%;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   header .wrapper {
     display: flex;
-    place-items: flex-start;
+    justify-content: center;
+    align-items: center;
     flex-wrap: wrap;
+    flex-direction: column;
+    width: 100%;
   }
 
   nav {
-    text-align: left;
-    margin-left: -1rem;
+    text-align: center;
+    margin-left: 0;
     font-size: 1rem;
-
     padding: 1rem 0;
     margin-top: 1rem;
+  }
+
+  .router-content-wrapper {
+    width: 100%;
+    max-width: 600px;
+    margin-top: 2rem;
+    padding: 0 1rem;
+    text-align: left;
+    margin-left: auto; /* Pushes the left edge to the right */
+    margin-right: auto; /* Pushes the right edge to the left */
   }
 }
 </style>

@@ -5,55 +5,10 @@ import {
   currentPercAsMissingKwh,
   getChargingMilliseconds,
   getChargingStartTime,
-  computeRemainingCarState,
   computeChargingDetails,
 } from '../calculateCharging'
 import { millisecondsToHours, secondsToMilliseconds } from 'date-fns'
 
-describe('computeRemainingCarState', () => {
-  it('should calculate remaing percentage with valid remaining Km input', () => {
-    const remainingKm = 50
-    const remainingPercentage = null
-    const maxKmRange = 100
-    const expectedKm = remainingKm 
-    const expectedPercentage = 50
-
-    const [actualKm, actualPercentage] = computeRemainingCarState(
-      remainingKm,
-      remainingPercentage,
-      maxKmRange,
-    )
-
-    expect(actualKm).toBe(expectedKm)
-    expect(actualPercentage).toBe(expectedPercentage)
-  })
-
-  it('should return the remaining percentage, nothing to be calculated', () => {
-    const remainingKm = 0
-    const remainingPercentage = 50
-    const maxKmRange = 100
-    const expectedKm = 50
-    const expectedPercentage = remainingPercentage
-
-    const [actualKm, actualPercentage] = computeRemainingCarState(
-      remainingKm,
-      remainingPercentage,
-      maxKmRange,
-    )
-
-    expect(actualKm).toBe(expectedKm)
-    expect(actualPercentage).toBe(expectedPercentage)
-  })
-
-  it('should should throw an error if both remaining Km and Percentage are invalid', () => {
-    const remainingKm = null
-    const remainingPercentage = 0
-    const maxKmRange = 100
-    expect(() => computeRemainingCarState(remainingKm, remainingPercentage, maxKmRange)).toThrow(
-      'You have to at least provide remaining kilometers or remaining percentage',
-    )
-  })
-})
 
 describe('computeChargingDetails', () => {
   it('should calculate charging amount and charging time with valid inputs', () => {

@@ -1,16 +1,5 @@
 import { secondsToMilliseconds } from 'date-fns'
 
-export function computeRemainingCarState(remainingKm, remainingPercentage, maxKmRange) {
-  if (!remainingKm && !remainingPercentage) {
-    throw new Error('You have to at least provide remaining kilometers or remaining percentage')
-  }
-
-  remainingKm = percentageToKm(remainingPercentage, maxKmRange)
-  remainingPercentage = kmToPercentage(remainingKm, maxKmRange)
-
-  return [remainingKm, remainingPercentage]
-}
-
 export function computeChargingDetails(
   currentRemainingPercentage,
   maxBatteryCapacityKwh,

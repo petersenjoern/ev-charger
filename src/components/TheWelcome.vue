@@ -1,95 +1,165 @@
-<script setup lang="ts">
-import WelcomeItem from './WelcomeItem.vue'
-import DocumentationIcon from './icons/IconDocumentation.vue'
-import ToolingIcon from './icons/IconTooling.vue'
-import EcosystemIcon from './icons/IconEcosystem.vue'
-import CommunityIcon from './icons/IconCommunity.vue'
-import SupportIcon from './icons/IconSupport.vue'
+<script setup>
+import { ref, computed } from 'vue'
+import { percentageToKm, kmToPercentage } from '@/logic/calculateCharging.js'
 
-const openReadmeInEditor = () => fetch('/__open-in-editor?file=README.md')
+const initialRemainingDistanceInput = ref(10);
+const initialRemainingBatteryInput = ref(10);
+
+const maxRange = ref(310);
+const maxBatteryCapacity = ref(38);
+const maxChargingRate = ref(3.6);
+const timeStep = ref('06:30');
+
+const allowedStep = (m) => m % 5 === 0
+
+
+const calculatedCarState = computed(() => {
+  if (!initialRemainingDistanceInput && !initialRemainingBatteryInput) {
+    throw new Error('You have to at least provide remaining kilometers or remaining percentage')
+  }
+
+  const distance = percentageToKm(initialRemainingBatteryInput.value, maxRange.value);
+  const percentage = kmToPercentage(initialRemainingDistanceInput.value, maxRange.value);
+
+  return { distance, percentage };
+});
+
+// Separate computed properties for display purposes
+const displayRemainingDistance = computed(() => {
+  return calculatedCarState.value.distance ?? 'N/A'; // Display 'N/A' if null
+});
+
+const displayRemainingBattery = computed(() => {
+  return calculatedCarState.value.percentage ?? 'N/A'; // Display 'N/A' if null
+});
+
+const updateRemainingDistanceInput = (value) => {
+  initialRemainingDistanceInput.value = value;
+  initialRemainingBatteryInput.value = kmToPercentage(value, maxRange.value);
+};
+
+const updateRemainingBatteryInput = (value) => {
+  initialRemainingBatteryInput.value = value;
+  initialRemainingDistanceInput.value = percentageToKm(value, maxRange.value);
+};
+
 </script>
 
 <template>
-  <WelcomeItem>
-    <template #icon>
-      <DocumentationIcon />
-    </template>
-    <template #heading>Documentation</template>
-
-    Vue’s
-    <a href="https://vuejs.org/" target="_blank" rel="noopener">official documentation</a>
-    provides you with all information you need to get started.
-  </WelcomeItem>
-
-  <WelcomeItem>
-    <template #icon>
-      <ToolingIcon />
-    </template>
-    <template #heading>Tooling</template>
-
-    This project is served and bundled with
-    <a href="https://vite.dev/guide/features.html" target="_blank" rel="noopener">Vite</a>. The
-    recommended IDE setup is
-    <a href="https://code.visualstudio.com/" target="_blank" rel="noopener">VSCode</a>
-    +
-    <a href="https://github.com/vuejs/language-tools" target="_blank" rel="noopener"
-      >Vue - Official</a
-    >. If you need to test your components and web pages, check out
-    <a href="https://vitest.dev/" target="_blank" rel="noopener">Vitest</a>
-    and
-    <a href="https://www.cypress.io/" target="_blank" rel="noopener">Cypress</a>
-    /
-    <a href="https://playwright.dev/" target="_blank" rel="noopener">Playwright</a>.
-
+  <v-container>
+    <h2>Charge Amount</h2>
+    <hr />
     <br />
+    <p>Remaining distance {{ displayRemainingDistance }}</p>
+    <v-number-input
+      :model-value="initialRemainingDistanceInput"
+      @update:model-value="updateRemainingDistanceInput"
+      :reverse="false"
+      controlVariant="split"
+      label="Remaining distance (km)"
+      :hideInput="false"
+      :inset="false"
+      variant="outlined"
+      :max="1000"
+      :min="0"
+      :step="5"
+      :precision="0"
+    ></v-number-input>
 
-    More instructions are available in
-    <a href="javascript:void(0)" @click="openReadmeInEditor"><code>README.md</code></a
-    >.
-  </WelcomeItem>
+    <p>Remaining battery {{ displayRemainingBattery }}</p>
+    <v-number-input
+      :model-value="initialRemainingBatteryInput"
+      @update:model-value="updateRemainingBatteryInput"
+      :reverse="false"
+      controlVariant="split"
+      label="Remaining Battery (%)"
+      :hideInput="false"
+      :inset="false"
+      variant="outlined"
+      :max="100"
+      :min="0"
+      :step="1"
+      :precision="0"
+    ></v-number-input>
 
-  <WelcomeItem>
-    <template #icon>
-      <EcosystemIcon />
-    </template>
-    <template #heading>Ecosystem</template>
+    <h2>Car</h2>
+    <hr />
+    <br />
+    <v-number-input
+      v-model:model-value="maxRange"
+      :reverse="false"
+      controlVariant="split"
+      label="Max. Range (km)"
+      :hideInput="false"
+      :inset="false"
+      variant="outlined"
+      :max="1000"
+      :min="0"
+      :step="5"
+      :precision="0"
+    ></v-number-input>
 
-    Get official tools and libraries for your project:
-    <a href="https://pinia.vuejs.org/" target="_blank" rel="noopener">Pinia</a>,
-    <a href="https://router.vuejs.org/" target="_blank" rel="noopener">Vue Router</a>,
-    <a href="https://test-utils.vuejs.org/" target="_blank" rel="noopener">Vue Test Utils</a>, and
-    <a href="https://github.com/vuejs/devtools" target="_blank" rel="noopener">Vue Dev Tools</a>. If
-    you need more resources, we suggest paying
-    <a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">Awesome Vue</a>
-    a visit.
-  </WelcomeItem>
+    <v-number-input
+      v-model:model-value="maxBatteryCapacity"
+      :reverse="false"
+      controlVariant="split"
+      label="Max. Battery Capacity (kWh)"
+      :hideInput="false"
+      :inset="false"
+      variant="outlined"
+      :max="100"
+      :min="0"
+      :step="1"
+      :precision="1"
+    ></v-number-input>
 
-  <WelcomeItem>
-    <template #icon>
-      <CommunityIcon />
-    </template>
-    <template #heading>Community</template>
+    <v-number-input
+      v-model:model-value="maxChargingRate"
+      :reverse="false"
+      controlVariant="split"
+      label="Max. Charging Rate (kW)"
+      :hideInput="false"
+      :inset="false"
+      variant="outlined"
+      :max="21"
+      :min="1"
+      :step="0.1"
+      :precision="1"
+    ></v-number-input>
 
-    Got stuck? Ask your question on
-    <a href="https://chat.vuejs.org" target="_blank" rel="noopener">Vue Land</a>
-    (our official Discord server), or
-    <a href="https://stackoverflow.com/questions/tagged/vue.js" target="_blank" rel="noopener"
-      >StackOverflow</a
-    >. You should also follow the official
-    <a href="https://bsky.app/profile/vuejs.org" target="_blank" rel="noopener">@vuejs.org</a>
-    Bluesky account or the
-    <a href="https://x.com/vuejs" target="_blank" rel="noopener">@vuejs</a>
-    X account for latest news in the Vue world.
-  </WelcomeItem>
-
-  <WelcomeItem>
-    <template #icon>
-      <SupportIcon />
-    </template>
-    <template #heading>Support Vue</template>
-
-    As an independent project, Vue relies on community backing for its sustainability. You can help
-    us by
-    <a href="https://vuejs.org/sponsor/" target="_blank" rel="noopener">becoming a sponsor</a>.
-  </WelcomeItem>
+    <h2>End Time</h2>
+    <hr />
+    <br />
+    <v-time-picker
+      v-model:model-value="timeStep"
+      :allowed-minutes="allowedStep"
+      format="24hr"
+      scrollable
+      color="#00bd7e"
+    ></v-time-picker>
+  </v-container>
 </template>
+
+<style scoped>
+h1 {
+  font-weight: 500;
+  font-size: 2.6rem;
+  position: relative;
+  top: -10px;
+}
+
+h2 {
+  font-size: 1.2rem;
+  position: relative;
+  text-align: left;
+  color: #20c490;
+}
+
+hr {
+  height: 0.25px;
+  color: #20c490;
+  background: #20c490;
+  font-size: 0;
+  border: 0;
+}
+</style>

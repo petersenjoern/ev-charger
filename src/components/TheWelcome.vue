@@ -1,6 +1,11 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { percentageToKm, kmToPercentage } from '@/logic/calculateCharging.js'
+import { percentageToKm, kmToPercentage, computeChargingDetails, getChargingStartTime} from '@/logic/calculateCharging.js'
+import { useDate } from 'vuetify'
+
+const adapter = useDate()
+const date = ref(new Date());
+
 
 const initialRemainingDistanceInput = ref(10);
 const initialRemainingBatteryInput = ref(10);
@@ -8,7 +13,7 @@ const initialRemainingBatteryInput = ref(10);
 const maxRange = ref(310);
 const maxBatteryCapacity = ref(38);
 const maxChargingRate = ref(3.6);
-const timeStep = ref('06:30');
+const chargeFinishTime = ref('06:30');
 
 const allowedStep = (m) => m % 5 === 0
 
@@ -22,16 +27,23 @@ const calculatedCarState = computed(() => {
   const percentage = kmToPercentage(initialRemainingDistanceInput.value, maxRange.value);
 
   return { distance, percentage };
-});
+})
 
-// Separate computed properties for display purposes
-const displayRemainingDistance = computed(() => {
-  return calculatedCarState.value.distance ?? 'N/A'; // Display 'N/A' if null
-});
+const calculatedChargeStartTime = computed(() => {
+  const [_, chargingTimeMilliseconds] = computeChargingDetails(
+    calculatedCarState.value.percentage,
+    maxBatteryCapacity.value,
+    maxChargingRate.value
+  );
+  
+  const chargingStartTime = getChargingStartTime(
+    chargingTimeMilliseconds,
+    date.value,
+    chargeFinishTime.value
+  );
 
-const displayRemainingBattery = computed(() => {
-  return calculatedCarState.value.percentage ?? 'N/A'; // Display 'N/A' if null
-});
+  return adapter.format(new Date(chargingStartTime), 'fullDateTime24h');
+})
 
 const updateRemainingDistanceInput = (value) => {
   initialRemainingDistanceInput.value = value;
@@ -50,7 +62,6 @@ const updateRemainingBatteryInput = (value) => {
     <h2>Charge Amount</h2>
     <hr />
     <br />
-    <p>Remaining distance {{ displayRemainingDistance }}</p>
     <v-number-input
       :model-value="initialRemainingDistanceInput"
       @update:model-value="updateRemainingDistanceInput"
@@ -66,7 +77,6 @@ const updateRemainingBatteryInput = (value) => {
       :precision="0"
     ></v-number-input>
 
-    <p>Remaining battery {{ displayRemainingBattery }}</p>
     <v-number-input
       :model-value="initialRemainingBatteryInput"
       @update:model-value="updateRemainingBatteryInput"
@@ -130,13 +140,22 @@ const updateRemainingBatteryInput = (value) => {
     <h2>End Time</h2>
     <hr />
     <br />
+    <v-date-picker
+      v-model="date"
+    ></v-date-picker>
     <v-time-picker
-      v-model:model-value="timeStep"
+      v-model:model-value="chargeFinishTime"
       :allowed-minutes="allowedStep"
       format="24hr"
       scrollable
       color="#00bd7e"
     ></v-time-picker>
+
+    <br />
+    <h2>Start Charge at</h2>
+    <hr />
+    <br />
+    <p>{{ calculatedChargeStartTime }}</p>
   </v-container>
 </template>
 

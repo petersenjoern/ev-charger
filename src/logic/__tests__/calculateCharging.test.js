@@ -120,10 +120,11 @@ describe('getChargingMilliseconds', () => {
 
 describe('getCharingStartTime', () => {
   it('should calculate when to begin charging with valid starttime', () => {
-    const dateNow = Date.now()
-    const targetFinishTime = dateNow + secondsToMilliseconds(2 * 60 * 60) // 2 hours from now
-    const chargingMilliseconds = secondsToMilliseconds(1 * 60 * 60)
-    const expectedStartTime = dateNow + secondsToMilliseconds(1 * 60 * 60)
-    expect(getChargingStartTime(chargingMilliseconds, targetFinishTime)).toBe(expectedStartTime)
+    // finish time is 2024-06-01 06:00; it takes 1 hour to charge; starting time should be 2024-06-01 05:00
+    const targetDate = new Date("2024-06-01");
+    const targetFinishTime = "6:00"
+    const millisecondsToCharge = secondsToMilliseconds(1 * 60 * 60)
+    const expectedStartTime = new Date("2024-06-01T05:00:00").getTime()
+    expect(getChargingStartTime(millisecondsToCharge, targetDate, targetFinishTime)).toBe(expectedStartTime)
   })
 })

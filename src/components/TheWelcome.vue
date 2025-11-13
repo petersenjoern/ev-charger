@@ -4,7 +4,7 @@ import { percentageToKm, kmToPercentage, computeChargingDetails, getChargingStar
 import { useDate } from 'vuetify'
 
 const adapter = useDate()
-const date = ref(new Date());
+const date = ref(new Date(Date.now()));
 
 
 const initialRemainingDistanceInput = ref(10);
@@ -59,103 +59,141 @@ const updateRemainingBatteryInput = (value) => {
 
 <template>
   <v-container>
-    <h2>Charge Amount</h2>
-    <hr />
-    <br />
-    <v-number-input
-      :model-value="initialRemainingDistanceInput"
-      @update:model-value="updateRemainingDistanceInput"
-      :reverse="false"
-      controlVariant="split"
-      label="Remaining distance (km)"
-      :hideInput="false"
-      :inset="false"
-      variant="outlined"
-      :max="1000"
-      :min="0"
-      :step="5"
-      :precision="0"
-    ></v-number-input>
-
-    <v-number-input
-      :model-value="initialRemainingBatteryInput"
-      @update:model-value="updateRemainingBatteryInput"
-      :reverse="false"
-      controlVariant="split"
-      label="Remaining Battery (%)"
-      :hideInput="false"
-      :inset="false"
-      variant="outlined"
-      :max="100"
-      :min="0"
-      :step="1"
-      :precision="0"
-    ></v-number-input>
-
-    <h2>Car</h2>
-    <hr />
-    <br />
-    <v-number-input
-      v-model:model-value="maxRange"
-      :reverse="false"
-      controlVariant="split"
-      label="Max. Range (km)"
-      :hideInput="false"
-      :inset="false"
-      variant="outlined"
-      :max="1000"
-      :min="0"
-      :step="5"
-      :precision="0"
-    ></v-number-input>
-
-    <v-number-input
-      v-model:model-value="maxBatteryCapacity"
-      :reverse="false"
-      controlVariant="split"
-      label="Max. Battery Capacity (kWh)"
-      :hideInput="false"
-      :inset="false"
-      variant="outlined"
-      :max="100"
-      :min="0"
-      :step="1"
-      :precision="1"
-    ></v-number-input>
-
-    <v-number-input
-      v-model:model-value="maxChargingRate"
-      :reverse="false"
-      controlVariant="split"
-      label="Max. Charging Rate (kW)"
-      :hideInput="false"
-      :inset="false"
-      variant="outlined"
-      :max="21"
-      :min="1"
-      :step="0.1"
-      :precision="1"
-    ></v-number-input>
-
-    <h2>End Time</h2>
-    <hr />
-    <br />
-    <v-date-picker
-      v-model="date"
-    ></v-date-picker>
-    <v-time-picker
-      v-model:model-value="chargeFinishTime"
-      :allowed-minutes="allowedStep"
-      format="24hr"
-      scrollable
-      color="#00bd7e"
-    ></v-time-picker>
-
     <br />
     <h2>Start Charge at</h2>
     <hr />
     <br />
     <p>{{ calculatedChargeStartTime }}</p>
+    <br />
+    <v-expansion-panels>
+      <v-expansion-panel>
+        <v-expansion-panel-title>
+          <template v-slot:default="{ expanded }">
+            <v-row no-gutters>
+              <v-col class="d-flex justify-start" cols="4"> Charge Amount </v-col>
+              <v-col class="text-grey" cols="8">
+              </v-col>
+            </v-row>
+          </template>
+        </v-expansion-panel-title>
+        <v-expansion-panel-text>
+          <v-number-input
+            :model-value="initialRemainingDistanceInput"
+            @update:model-value="updateRemainingDistanceInput"
+            :reverse="false"
+            controlVariant="split"
+            label="Remaining distance (km)"
+            :hideInput="false"
+            :inset="false"
+            variant="outlined"
+            :max="1000"
+            :min="0"
+            :step="5"
+            :precision="0"
+          ></v-number-input>
+          <v-number-input
+            :model-value="initialRemainingBatteryInput"
+            @update:model-value="updateRemainingBatteryInput"
+            :reverse="false"
+            controlVariant="split"
+            label="Remaining Battery (%)"
+            :hideInput="false"
+            :inset="false"
+            variant="outlined"
+            :max="100"
+            :min="0"
+            :step="1"
+            :precision="0"
+          ></v-number-input>
+        </v-expansion-panel-text>
+      </v-expansion-panel>
+  </v-expansion-panels>
+
+
+    <v-expansion-panels>
+      <v-expansion-panel>
+        <v-expansion-panel-title>
+          <template v-slot:default="{ expanded }">
+            <v-row no-gutters>
+              <v-col class="d-flex justify-start" cols="4"> Car Specifications </v-col>
+              <v-col class="text-grey" cols="8">
+              </v-col>
+            </v-row>
+          </template>
+        </v-expansion-panel-title>
+        <v-expansion-panel-text>
+          <v-number-input
+            v-model:model-value="maxRange"
+            :reverse="false"
+            controlVariant="split"
+            label="Max. Range (km)"
+            :hideInput="false"
+            :inset="false"
+            variant="outlined"
+            :max="1000"
+            :min="0"
+            :step="5"
+            :precision="0"
+          ></v-number-input>
+
+          <v-number-input
+            v-model:model-value="maxBatteryCapacity"
+            :reverse="false"
+            controlVariant="split"
+            label="Max. Battery Capacity (kWh)"
+            :hideInput="false"
+            :inset="false"
+            variant="outlined"
+            :max="100"
+            :min="0"
+            :step="1"
+            :precision="1"
+          ></v-number-input>
+
+          <v-number-input
+            v-model:model-value="maxChargingRate"
+            :reverse="false"
+            controlVariant="split"
+            label="Max. Charging Rate (kW)"
+            :hideInput="false"
+            :inset="false"
+            variant="outlined"
+            :max="21"
+            :min="1"
+            :step="0.1"
+            :precision="1"
+          ></v-number-input>
+        </v-expansion-panel-text>
+      </v-expansion-panel>
+  </v-expansion-panels>
+
+
+    <v-expansion-panels>
+      <v-expansion-panel>
+        <v-expansion-panel-title>
+          <template v-slot:default="{ expanded }">
+            <v-row no-gutters>
+              <v-col class="d-flex justify-start" cols="4"> End Time </v-col>
+              <v-col class="text-grey" cols="8">
+              </v-col>
+            </v-row>
+          </template>
+        </v-expansion-panel-title>
+        <v-expansion-panel-text>
+          <v-date-picker
+            v-model="date"
+          ></v-date-picker>
+          <v-time-picker
+            v-model:model-value="chargeFinishTime"
+            :allowed-minutes="allowedStep"
+            format="24hr"
+            scrollable
+            color="#00bd7e"
+          ></v-time-picker>
+        </v-expansion-panel-text>
+      </v-expansion-panel>
+  </v-expansion-panels>
+
   </v-container>
 </template>
 
